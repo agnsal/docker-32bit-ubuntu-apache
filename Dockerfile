@@ -1,34 +1,6 @@
-FROM daald/ubuntu32
+FROM daald/ubuntu32:wily
 MAINTAINER Agnese Salutari
 
-# Install base packages
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get -yq install \
-        curl \
-        apache2 \
-        libapache2-mod-php5 \
-        php5-mysql \
-        php5-mcrypt \
-        php5-gd \
-        php5-curl \
-        php-pear \
-        php-apc && \
-    rm -rf /var/lib/apt/lists/* && \
-    curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-RUN /usr/sbin/php5enmod mcrypt
-RUN echo "ServerName localhost" >> /etc/apache2/apache2.conf && \
-    sed -i "s/variables_order.*/variables_order = \"EGPCS\"/g" /etc/php5/apache2/php.ini
+RUN apt-get update
+RUN apt-get install apache2 apache2-doc apache2-utils libapache2-mod-php5 php5 php5-common php5-gd php5-mysql php5-imap phpmyadmin php5-cli php5-cgi libapache2-mod-fcgid apache2-suexec-pristine php-pear php-auth php5-mcrypt mcrypt php5-imagick imagemagick libruby libapache2-mod-python php5-curl php5-intl php5-memcache php5-memcached php5-ming php5-ps php5-pspell php5-recode php5-sqlite php5-tidy php5-xmlrpc php5-xsl memcached
 
-ENV ALLOW_OVERRIDE **False**
-
-# Add image configuration and scripts
-ADD run.sh /run.sh
-RUN chmod 755 /*.sh
-
-# Configure /app folder with sample app
-RUN mkdir -p /app && rm -fr /var/www/html && ln -s /app /var/www/html
-ADD sample/ /app
-
-EXPOSE 80
-WORKDIR /app
-CMD ["/run.sh"]
